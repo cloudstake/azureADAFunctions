@@ -8,8 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - run: cd cncli
       - name: Rust w/musl
-        uses: juankaram/rust-musl-action@master
+        uses: nscoder/rust-musl-action@master
         env:
           BUILD_TARGET: x86_64-unknown-linux-musl
         with:

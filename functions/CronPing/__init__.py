@@ -12,6 +12,9 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
     
+    fileperm = os.stat("./bin/cncli")
+    logging.info(fileperm)
+    
     result = subprocess.run(["./bin/cncli", "ping","--host","north-america.relays-new.cardano-mainnet.iohk.io"],capture_output=True)
     logging.info(result)
 

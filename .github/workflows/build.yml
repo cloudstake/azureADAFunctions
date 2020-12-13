@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - run: pwd
       - run: mkdir ${GITHUB_WORKSPACE}/functions/bin
       - run: docker pull clux/muslrust
       - run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release

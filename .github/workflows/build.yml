@@ -2,6 +2,11 @@ name: AzureADA Function Builds
 
 on: push
 
+env:
+  AZURE_FUNCTIONAPP_NAME: azureada-functions # set this to your application's name
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './functions'   # set this to the path to your web app project, defaults to the repository root
+  PYTHON_VERSION: '3.8'                 # set this to the python version to use (supports 3.6, 3.7, 3.8)
+
 jobs:
   build_cncli:
     name: Build cncli tool
@@ -11,10 +16,24 @@ jobs:
       # - run: cd cncli
       - run: docker pull clux/muslrust
       - run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
-      # - name: Rust w/musl
-      #   uses: clux/muslrust@master
-      #   env:
-      #     BUILD_TARGET: x86_64-unknown-linux-musl
-      #   with:
-      #     args: cargo build --target $BUILD_TARGET --release
-      - run: mv target/x86_64-unknown-linux-musl/release/cncli ../functions/bin/
+      - run: mv ${GITHUB_WORKSPACE}/cnclitarget/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/cncli/functions/bin/
+      
+      - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 'Resolve Project Dependencies Using Pip'
+        shell: bash
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          popd
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}

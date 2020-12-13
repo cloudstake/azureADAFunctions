@@ -1,0 +1,9 @@
+
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+__blobstorage__/8aae7758-2d7c-43aa-9a30-9747849dcfb7
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json

@@ -10,8 +10,9 @@ jobs:
       - uses: actions/checkout@v1
       - run: cd cncli
       - name: Rust w/musl
-        uses: nscoder/rust-musl-action@master
+        uses: clux/muslrust@master
         env:
           BUILD_TARGET: x86_64-unknown-linux-musl
         with:
           args: cargo build --target $BUILD_TARGET --release
+      - run: mv target/x86_64-unknown-linux-musl/release/cncli ../functions/bin/

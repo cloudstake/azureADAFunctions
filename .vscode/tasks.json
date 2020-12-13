@@ -27,6 +27,11 @@
 			"options": {
 				"cwd": "${workspaceFolder}/functions"
 			}
+		},
+		{
+			"label": "Build cncli",
+			"type": "shell",
+			"command": "docker run -v ${workspaceFolder}/cncli:/volume --rm -t clux/muslrust cargo build --release"
 		}
 	]
 }

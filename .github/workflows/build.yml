@@ -21,7 +21,8 @@ jobs:
       
       - name: Copy cncli to bin folder for deployment
         run: cp ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin
-      - run: sudo chown `whoami` ${GITHUB_WORKSPACE}/functions/bin/cncli 
+      - run: sudo chown `whoami` ${GITHUB_WORKSPACE}/functions/bin/cncli
+      - run: ls -l ${GITHUB_WORKSPACE}/functions/bin/cncli
       
       - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
         uses: actions/setup-python@v1

@@ -13,12 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: pwd
+      - 
       - run: mkdir ${GITHUB_WORKSPACE}/functions/bin
-      - run: docker pull clux/muslrust
-      - run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
-      - run: ls -ld ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin
-      - run: cp ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin
+      - name: Pull docker container for cross-compilation
+        run: docker pull clux/muslrust
+      - name: Cross-compile cncli
+        run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
+      
+      - name: Copy cncli to bin folder for deployment
+        run: cp ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin
       
       - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
         uses: actions/setup-python@v1

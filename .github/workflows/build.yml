@@ -16,7 +16,7 @@ jobs:
       - run: mkdir ${GITHUB_WORKSPACE}/bin
       - run: docker pull clux/muslrust
       - run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
-      - run: mv ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin/
+      - run: mv ${GITHUB_WORKSPACE}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${GITHUB_WORKSPACE}/functions/bin
       
       - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
         uses: actions/setup-python@v1

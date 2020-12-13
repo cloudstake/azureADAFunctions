@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - 
       - run: mkdir ${GITHUB_WORKSPACE}/functions/bin
       - name: Pull docker container for cross-compilation
         run: docker pull clux/muslrust

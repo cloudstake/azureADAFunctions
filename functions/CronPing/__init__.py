@@ -15,6 +15,9 @@ def main(mytimer: func.TimerRequest) -> None:
     
     fileperm = os.stat("./bin/cncli")
     logging.info(oct(fileperm.st_mode))
+    logging.info(os.getuid())
+    logging.info(os.getgid())
+    logging.info(os.getgroups())
 
     result = subprocess.run(["./bin/cncli", "ping","--host","north-america.relays-new.cardano-mainnet.iohk.io"],capture_output=True)
     logging.info(result)

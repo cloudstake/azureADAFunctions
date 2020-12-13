@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: cd cncli
+      # - run: cd cncli
       - run: docker pull clux/muslrust
-      - run: docker run -v $PWD:/volume --rm -t clux/muslrust cargo build --release
+      - run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
       # - name: Rust w/musl
       #   uses: clux/muslrust@master
       #   env:

@@ -9,10 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: cd cncli
-      - name: Rust w/musl
-        uses: clux/muslrust@master
-        env:
-          BUILD_TARGET: x86_64-unknown-linux-musl
-        with:
-          args: cargo build --target $BUILD_TARGET --release
+      - run: docker pull clux/muslrust
+      - run: docker run -v $PWD:/volume --rm -t clux/muslrust cargo build --release
+      # - name: Rust w/musl
+      #   uses: clux/muslrust@master
+      #   env:
+      #     BUILD_TARGET: x86_64-unknown-linux-musl
+      #   with:
+      #     args: cargo build --target $BUILD_TARGET --release
       - run: mv target/x86_64-unknown-linux-musl/release/cncli ../functions/bin/

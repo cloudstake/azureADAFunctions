@@ -13,7 +13,7 @@ def main(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.info('The timer is past due!')
     
-    # os.chmod("./bin/cncli",0o544)
+    os.popen("chmod u+x ./bin/cncli").read()
     fileperm = os.stat("./bin/cncli")
     logging.info(oct(fileperm.st_mode))
     logging.info(fileperm)

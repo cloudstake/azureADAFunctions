@@ -16,14 +16,6 @@ def main(mytimer: func.TimerRequest) -> None:
 
     if mytimer.past_due:
         logging.info('The timer is past due!')
-    
-    os.popen("chmod u+x ./bin/cncli").read()
-    fileperm = os.stat("./bin/cncli")
-    logging.info(oct(fileperm.st_mode))
-    logging.info(fileperm)
-    logging.info(os.getuid())
-    logging.info(os.getgid())
-    logging.info(os.getgroups())
 
     for host in hosts:
         ping(host)
@@ -44,4 +36,3 @@ def ping(host: string, port: int = None, magic: string = None):
         report(out)
 
 def report(result):
-    

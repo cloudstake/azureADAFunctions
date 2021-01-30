@@ -2,6 +2,7 @@ import datetime
 import logging
 import subprocess
 import os
+import json
 
 import azure.functions as func
 

@@ -8,11 +8,10 @@
       "schedule": "0 */5 * * * *"
     },
     {
-      "type": "eventGrid",
-      "name": "outputEvent",
-      "topicEndpointUri": "ErrorEventGrid",
-      "topicKeySetting": "ErrorKeySetting",
-      "direction": "out"
+      "type": "queue",
+      "direction": "out",
+      "name": "msg",
+      "queueName": "pingqueue"
     }
   ]
 }

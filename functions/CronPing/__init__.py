@@ -9,8 +9,10 @@ hosts = [
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
 ]
+msgQueue = None
 
-def main(mytimer: func.TimerRequest) -> None:
+def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
+    msgQueue = msg
     utc_timestamp = datetime.datetime.utcnow().replace(
         tzinfo=datetime.timezone.utc).isoformat()
 
@@ -36,3 +38,4 @@ def ping(host: string, port: int = None, magic: string = None):
         report(out)
 
 def report(result):
+    msgQueue.set(result)

@@ -3,6 +3,7 @@ import logging
 import subprocess
 import os
 import json
+import typing
 
 import azure.functions as func
 

@@ -26,7 +26,7 @@ def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
 
-def ping(host: string, port: int = None, magic: string = None):
+def ping(host: str, port: int = None, magic: str = None):
     args = ["./bin/cncli", "ping","--host",host]
     if port != None:
         args.append("--port")

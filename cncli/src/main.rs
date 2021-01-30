@@ -1,4 +1,12 @@
+extern crate chrono_tz;
+extern crate libc;
+
+use std::{panic, process};
+use std::env::{set_var, var};
+
 use structopt::StructOpt;
+
+use cncli::nodeclient::{self, Command};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "cncli", about = "A community-built cardano-node CLI")]
@@ -7,36 +15,27 @@ struct Cli {
     cmd: Command,
 }
 
-#[derive(Debug, StructOpt)]
-enum Command {
-    Ping {
-        #[structopt(short, long, help = "cardano-node hostname to connect to")]
-        host: String,
-        #[structopt(short, long, default_value = "3000", help = "cardano-node port")]
-        port: u16,
-    },
-    Validate {
-        #[structopt(long, help = "block hash to validate")]
-        hash: String,
-        #[structopt(short, long, help = "absolute slot to validate")]
-        slot: u64,
-        #[structopt(short, long, help = "cardano-node hostname to connect to")]
-        host: String,
-        #[structopt(short, long, default_value = "3000", help = "cardano-node port")]
-        port: u16,
-    },
-    Sync {
-        #[structopt(parse(from_os_str), short, long, help = "sqlite database file")]
-        db: std::path::PathBuf,
-        #[structopt(short, long, help = "cardano-node hostname to connect to")]
-        host: String,
-        #[structopt(short, long, default_value = "3000", help = "cardano-node port")]
-        port: u16,
-    },
-}
-
-
 fn main() {
+    match var("RUST_LOG") {
+        Ok(_) => {}
+        Err(_) => {
+            // set a default logging level of info if unset.
+            set_var("RUST_LOG", "info");
+        }
+    }
+    pretty_env_logger::init_timed();
+
+    // take_hook() returns the default hook in case when a custom one is not set
+    let orig_hook = panic::take_hook();
+    panic::set_hook(Box::new(move |panic_info| {
+        // invoke the default handler and exit the process
+        orig_hook(panic_info);
+        process::exit(1);
+    }));
+
     let args = Cli::from_args();
-    println!("args: {:?}", args);
+    nodeclient::start(args.cmd)
 }
+
+#[cfg(test)]
+mod test;

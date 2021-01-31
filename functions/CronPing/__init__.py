@@ -22,7 +22,7 @@ def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
         logging.info('The timer is past due!')
 
     for host in hosts:
-        ping(host)
+        ping(host[0],host[1],host[2])
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
 

@@ -1,3 +1,0 @@
-[submodule "libsodium"]
-	path = cncli/libsodium
-	url = https://github.com/input-output-hk/libsodium.git

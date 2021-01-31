@@ -16,6 +16,8 @@ jobs:
       - run: mkdir ${GITHUB_WORKSPACE}/functions/bin
       - name: Pull docker container for cross-compilation
         run: docker pull clux/muslrust
+      - name: pull cncli git repo
+        run: git clone https://github.com/AndrewWestberg/cncli.git
       - name: Cross-compile cncli
         run: docker run -v ${GITHUB_WORKSPACE}/cncli:/volume --rm -t clux/muslrust cargo build --release
       

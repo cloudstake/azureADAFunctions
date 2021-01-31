@@ -19,7 +19,7 @@ def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
         ping(host[0],host[1],host[2])
     if len(queue) > 0:
         msg.set(queue)
-        raise 0
+        raise Exception("error")
 
 def ping(host: str, port: int = None, magic: str = None):
     args = ["./bin/cncli", "ping","--host",host]

@@ -34,6 +34,7 @@ def ping(host: str, port: int = None, magic: str = None):
     if magic != None:
         args.append("--magic")
         args.append(magic)
+    logging.info(args)
     result = subprocess.run(args,capture_output=True)
     out = json.loads(result.stdout);
     if out.status != "ok":

@@ -1,6 +1,6 @@
 name: AzureADA Function Builds
 
-on: push
+# on: push
 
 env:
   AZURE_FUNCTIONAPP_NAME: azureada-functions # set this to your application's name

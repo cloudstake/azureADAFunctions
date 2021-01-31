@@ -11,13 +11,14 @@ hosts = [
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
 ]
-msgQueue: func.Out[typing.List[str]] = None
+queue: typing.List[str] = list()
 
 def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
-    msgQueue = msg
 
     for host in hosts:
         ping(host[0],host[1],host[2])
+    if len(queue) > 0:
+        msg.set(queue)
 
 def ping(host: str, port: int = None, magic: str = None):
     args = ["./bin/cncli", "ping","--host",host]
@@ -30,9 +31,5 @@ def ping(host: str, port: int = None, magic: str = None):
     result = subprocess.run(args,capture_output=True)
     out = json.loads(result.stdout);
     logging.info(out)
-    report(out)
-    # if out["status"] != "ok":
-    #     report(out)
-
-def report(result):
-    msgQueue.set(result)
+    if out["status"] != "ok":
+        queue.append("Host: {0} Status: {}".format(result["host"], result["status"]))    

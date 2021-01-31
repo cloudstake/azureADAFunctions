@@ -11,20 +11,13 @@ hosts = [
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
 ]
-msgQueue = None
+msgQueue: func.Out[typing.List[str]] = None
 
 def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
     msgQueue = msg
-    utc_timestamp = datetime.datetime.utcnow().replace(
-        tzinfo=datetime.timezone.utc).isoformat()
-
-    if mytimer.past_due:
-        logging.info('The timer is past due!')
 
     for host in hosts:
         ping(host[0],host[1],host[2])
-
-    logging.info('Python timer trigger function ran at %s', utc_timestamp)
 
 def ping(host: str, port: int = None, magic: str = None):
     args = ["./bin/cncli", "ping","--host",host]
@@ -34,11 +27,12 @@ def ping(host: str, port: int = None, magic: str = None):
     if magic != None:
         args.append("--magic")
         args.append(magic)
-    logging.info(args)
     result = subprocess.run(args,capture_output=True)
     out = json.loads(result.stdout);
-    if out.status != "ok":
-        report(out)
+    logging.info(out)
+    report(out)
+    # if out["status"] != "ok":
+    #     report(out)
 
 def report(result):
     msgQueue.set(result)

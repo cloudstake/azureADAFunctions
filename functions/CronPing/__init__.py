@@ -6,22 +6,30 @@ import json
 import typing
 
 import azure.functions as func
+from pip._vendor import requests
 
 hosts = [
     ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
-    ("north-america.relays-new.cardano-mainnet.iohk.io",None,None),
 ]
-queue: typing.List[str] = list()
+dataToQueue = list()
 
-def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]]) -> None:
+def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]], config) -> None:
 
-    for host in hosts:
-        ping(host[0],host[1],host[2])
-    if len(queue) > 0:
-        msg.set(queue)
+    TELEGRAM_CHATS = os.environ["TELEGRAM_CHATS"]
+    logging.info(TELEGRAM_CHATS)
+    TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+    configObj = json.loads(config.read())
+    logging.info(configObj["hosts"][0])
+    for host in configObj["hosts"]:
+        ping(host["host"],host["port"],host["magic"])
+    if len(dataToQueue) > 0:
+        for m in dataToQueue:
+            send_message(m, TELEGRAM_CHATS, TELEGRAM_BOT_TOKEN)
+        msg.set(dataToQueue)
+
         raise Exception("error")
 
-def ping(host: str, port: int = None, magic: str = None):
+def ping(host: str, port: str = None, magic: str = None):
     args = ["./bin/cncli", "ping","--host",host]
     if port != None:
         args.append("--port")
@@ -33,4 +41,21 @@ def ping(host: str, port: int = None, magic: str = None):
     out = json.loads(result.stdout);
     logging.info(out)
     if out["status"] != "ok":
-        queue.append("Host: {0} Status: {}".format(result["host"], result["status"]))    
+        dataToQueue.append("Host: {0} Status: {}".format(out["host"], out["status"]))    
+
+def send_message(message, TELEGRAM_CHATS, TELEGRAM_BOT_TOKEN):
+    if TELEGRAM_CHATS.count(',') > 0:
+        for chat in TELEGRAM_CHATS.split(','):
+            logging.info(chat)
+            send_message(message,chat,TELEGRAM_BOT_TOKEN)
+    else:
+        params = {
+            'chat_id': TELEGRAM_CHATS,
+            'text': message
+        }
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        r = requests.get(url, params=params)
+        if r.status_code == 200:
+            print(json.dumps(r.json(), indent=2))
+        else:
+            r.raise_for_status()

@@ -1,0 +1,91 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        
+        "base_name": {
+            "type": "string",
+            "defaultValue": "azureada",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "storage_name": "[concat(parameters('base_name'),'storage')]",
+        "server_name": "[concat(parameters('base_name'),'_appsvcplan')]",
+        "functionapp_name": "[concat(parameters('base_name'),'functionappsvc')]",
+        "appinsights_name": "[concat(parameters('base_name'),'_appinsights')]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[variables('appinsights_name')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Flow_Type": "Bluefield",
+                "Request_Source": "rest",
+                "RetentionInDays": 90,
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled"
+            }
+        },
+        {
+            "name": "[variables('storage_name')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "[variables('storage_name')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            }
+        },
+        {
+            "name": "[variables('server_name')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "tags": {
+                "displayName": "[variables('server_name')]"
+            },
+            "properties": {
+                "name": "[variables('server_name')]"
+            },
+            "kind": "functionapp"
+        },
+        {
+            "name": "[variables('functionapp_name')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, concat('/providers/Microsoft.Web/serverfarms/',variables('server_name')))]": "Resource",
+                "displayName": "[variables('functionapp_name')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('server_name'))]"
+            ],
+            "kind": "functionapp,linux",
+            "properties": {
+                "name": "[variables('functionapp_name')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('server_name'))]"
+            }
+        }
+    ],
+    "outputs": {}
+}

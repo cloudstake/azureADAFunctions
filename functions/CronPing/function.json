@@ -8,12 +8,6 @@
       "schedule": "0 */5 * * * *"
     },
     {
-      "type": "queue",
-      "direction": "out",
-      "name": "msg",
-      "queueName": "pingqueue"
-    },
-    {
       "type": "blob",
       "name": "config",
       "path": "function-config/ping.config",

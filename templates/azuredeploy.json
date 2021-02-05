@@ -2,12 +2,19 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        
+
         "base_name": {
             "type": "string",
             "defaultValue": "azureada",
             "metadata": {
                 "description": "description"
+            }
+        },
+        "telegram_bot_token": {
+            "type": "string",
+            "defaultValue": "invalid",
+            "metadata": {
+                "description": "A telegram bot token to use for notifications."
             }
         }
     },
@@ -49,6 +56,26 @@
             }
         },
         {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('storage_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
             "name": "[variables('server_name')]",
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
@@ -64,7 +91,8 @@
                 "displayName": "[variables('server_name')]"
             },
             "properties": {
-                "name": "[variables('server_name')]"
+                "name": "[variables('server_name')]",
+                "hyperV": false
             },
             "kind": "functionapp"
         },
@@ -83,7 +111,172 @@
             "kind": "functionapp,linux",
             "properties": {
                 "name": "[variables('functionapp_name')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('server_name'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('server_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storage_name'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storage_name')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storage_name'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storage_name')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(variables('functionapp_name'))]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('appinsights_name')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        {
+                            "name": "TELEGRAM_BOT_TOKEN",
+                            "value": "[parameters('telegram_bot_token')]
+                        }
+                    ]
+                }
+            }
+        },
+        // {
+        //     "type": "Microsoft.Web/sites/config",
+        //     "apiVersion": "2018-11-01",
+        //     "name": "[concat(variables('functionapp_name'), '/web')]",
+        //     "location": "Central US",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Web/sites', variables('functionapp_name'))]"
+        //     ],
+        //     "properties": {
+        //         "numberOfWorkers": -1,
+        //         "defaultDocuments": [
+        //             "Default.htm",
+        //             "Default.html",
+        //             "Default.asp",
+        //             "index.htm",
+        //             "index.html",
+        //             "iisstart.htm",
+        //             "default.aspx",
+        //             "index.php"
+        //         ],
+        //         "netFrameworkVersion": "v4.0",
+        //         "linuxFxVersion": "PYTHON|3.8",
+        //         "requestTracingEnabled": false,
+        //         "remoteDebuggingEnabled": false,
+        //         "remoteDebuggingVersion": "VS2019",
+        //         "httpLoggingEnabled": false,
+        //         "logsDirectorySizeLimit": 35,
+        //         "detailedErrorLoggingEnabled": false,
+        //         "publishingUsername": "$azureada-functions",
+        //         "azureStorageAccounts": {},
+        //         "scmType": "None",
+        //         "use32BitWorkerProcess": false,
+        //         "webSocketsEnabled": false,
+        //         "alwaysOn": false,
+        //         "managedPipelineMode": "Integrated",
+        //         "virtualApplications": [
+        //             {
+        //                 "virtualPath": "/",
+        //                 "physicalPath": "site\\wwwroot",
+        //                 "preloadEnabled": false
+        //             }
+        //         ],
+        //         "loadBalancing": "LeastRequests",
+        //         "experiments": {
+        //             "rampUpRules": []
+        //         },
+        //         "autoHealEnabled": false,
+        //         "cors": {
+        //             "allowedOrigins": [
+        //                 "https://functions.azure.com",
+        //                 "https://functions-staging.azure.com",
+        //                 "https://functions-next.azure.com"
+        //             ],
+        //             "supportCredentials": false
+        //         },
+        //         "localMySqlEnabled": false,
+        //         "ipSecurityRestrictions": [
+        //             {
+        //                 "ipAddress": "Any",
+        //                 "action": "Allow",
+        //                 "priority": 1,
+        //                 "name": "Allow all",
+        //                 "description": "Allow all access"
+        //             }
+        //         ],
+        //         "scmIpSecurityRestrictions": [
+        //             {
+        //                 "ipAddress": "Any",
+        //                 "action": "Allow",
+        //                 "priority": 1,
+        //                 "name": "Allow all",
+        //                 "description": "Allow all access"
+        //             }
+        //         ],
+        //         "scmIpSecurityRestrictionsUseMain": false,
+        //         "http20Enabled": false,
+        //         "minTlsVersion": "1.2",
+        //         "ftpsState": "AllAllowed",
+        //         "reservedInstanceCount": 0
+        //     }
+        // },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('storage_name'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storage_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('storage_name'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storage_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('storage_name'), '/default/function-config')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storage_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('storage_name'), '/default/scm-releases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storage_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
             }
         }
     ],

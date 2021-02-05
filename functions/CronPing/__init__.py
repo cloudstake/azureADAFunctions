@@ -15,11 +15,11 @@ dataToQueue = list()
 
 def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]], config) -> None:
 
-    TELEGRAM_CHATS = os.environ["TELEGRAM_CHATS"]
-    logging.info(TELEGRAM_CHATS)
     TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
     configObj = json.loads(config.read())
-    logging.info(configObj["hosts"][0])
+    TELEGRAM_CHATS = configObj["telegramRecipients"]
+    # logging.info(TELEGRAM_CHATS)
+    # logging.info(configObj["hosts"][0])
     for host in configObj["hosts"]:
         ping(host["host"],host["port"],host["magic"])
     if len(dataToQueue) > 0:

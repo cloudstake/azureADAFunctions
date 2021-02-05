@@ -1,6 +1,6 @@
 ## Known Issues
 
-Automated builds are NOT functional. See azure/functions-action#52 for details, but once that works, it should be fine.
+Automated builds are NOT functional. See [azure/functions-action#52](/azure/functions-action/issues/52) for details, but once that works, it should be fine.
 In the meantime, use Visual Studio Code, make sure Docker is installed (on Windows or Linux) and the "Build cncli" task.
 
 ## Installation
@@ -27,4 +27,8 @@ In the meantime, use Visual Studio Code, make sure Docker is installed (on Windo
 
 ## Configuration
 
-The system uses a combination of Function App configuration settings and a file in blob storage for the majority of it's configuration. The most significant portion is the ping.config file in the function-config container in the storage account created by the deployment
+The system uses a combination of Function App configuration settings and a file in blob storage for the majority of it's configuration. The most significant portion is the ping.config file in the function-config container in the storage account created by the ARM template. The format is straightforward, and the sample data is obvious. 
+
+The only thing worth noting is that the telegramRecipients is a string, and can contain more than one recipient, separated by a comma. It has NOT been tested with spaces in the string.
+
+Currently, it pings every server in the list every 5 minutes. To change the timing, modify the functions/CronPing/function.json trigger schedule.

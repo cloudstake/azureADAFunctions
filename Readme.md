@@ -1,6 +1,6 @@
 ## Known Issues
 
-Automated builds are NOT functional. See [azure/functions-action#52](../../azure/functions-action/issues/52) for details, but once that works, it should be fine.
+Automated builds are NOT functional. See [azure/functions-action#52](https://github.com/azure/functions-action/issues/52) for details, but once that works, it should be fine.
 In the meantime, use Visual Studio Code, make sure Docker is installed (on Windows or Linux) and the "Build cncli" task.
 
 ## Installation

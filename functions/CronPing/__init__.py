@@ -13,7 +13,7 @@ hosts = [
 ]
 dataToQueue = list()
 
-def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]], config) -> None:
+def main(mytimer: func.TimerRequest, config) -> None:
 
     TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
     configObj = json.loads(config.read())
@@ -25,7 +25,6 @@ def main(mytimer: func.TimerRequest, msg: func.Out[typing.List[str]], config) ->
     if len(dataToQueue) > 0:
         for m in dataToQueue:
             send_message(m, TELEGRAM_CHATS, TELEGRAM_BOT_TOKEN)
-        msg.set(dataToQueue)
 
         raise Exception("error")
 

@@ -94,7 +94,7 @@
                 "name": "[variables('server_name')]",
                 "hyperV": false
             },
-            "kind": "functionapp"
+            "kind": "functionapp,linux"
         },
         {
             "name": "[variables('functionapp_name')]",
@@ -136,7 +136,7 @@
                         },
                         {
                             "name": "TELEGRAM_BOT_TOKEN",
-                            "value": "[parameters('telegram_bot_token')]
+                            "value": "[parameters('telegram_bot_token')]"
                         }
                     ]
                 }

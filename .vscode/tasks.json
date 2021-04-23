@@ -31,7 +31,7 @@
 		{
 			"label": "Build cncli",
 			"type": "shell",
-			"command": "git clone https://github.com/AndrewWestberg/cncli.git; ${workspaceFolder}/cncli; docker run -v ${workspaceFolder}/cncli:/volume --rm -t clux/muslrust cargo build --release ; mv ${workspaceFolder}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${workspaceFolder}/functions/bin",
+			"command": "git clone https://github.com/AndrewWestberg/cncli.git; docker run -v ${workspaceFolder}\\cncli:/volume --rm -t clux/muslrust cargo build --release ; mv ${workspaceFolder}/cncli/target/x86_64-unknown-linux-musl/release/cncli ${workspaceFolder}/functions/bin",
 			"problemMatcher": []
 		}
 	]

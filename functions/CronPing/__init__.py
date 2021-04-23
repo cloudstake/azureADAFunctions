@@ -40,7 +40,7 @@ def ping(host: str, port: str = None, magic: str = None):
     out = json.loads(result.stdout);
     logging.info(out)
     if out["status"] != "ok":
-        dataToQueue.append("Host: {0} Status: {}".format(out["host"], out["status"]))    
+        dataToQueue.append("Host: {} Status: {}".format(out["host"], out["status"]))    
 
 def send_message(message, TELEGRAM_CHATS, TELEGRAM_BOT_TOKEN):
     if TELEGRAM_CHATS.count(',') > 0:
